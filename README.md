@@ -17,9 +17,9 @@ Pin is a note-taking application designed for speed and simplicity. All your not
 
 | Main View (Light)                                | Note Editor                                    |
 | ------------------------------------------------ | ---------------------------------------------- |
-| ![Main View Light Mode](./assets/screenshot-main-light.png) | ![Note Editor](./assets/screenshot-editor.png) |
+| ![Main View Light Mode](./public/screenshot1.png) | ![Note Editor](./public/screenshot1.png) |
 | **Tags Page (Dark)**                               | **Settings Page**                                |
-| ![Tags Page Dark Mode](./assets/screenshot-tags-dark.png) | ![Settings Page](./assets/screenshot-settings.png) |
+| ![Tags Page Dark Mode](./public/screenshot1.png) | ![Settings Page](./public/screenshot1.png) |
 
 ## Key Features
 
