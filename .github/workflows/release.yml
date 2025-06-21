@@ -5,43 +5,69 @@ on:
     tags:
       - 'v*' # Trigger this workflow on tags starting with 'v' (e.g., v1.0.0, v1.1.0)
 
+permissions:
+  contents: write # Required for creating releases and uploading assets
+
 jobs:
   release:
-    runs-on: ${{ matrix.os }} # Run on all three operating systems
+    runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false # Don't cancel other jobs if one fails
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest] # Build for Mac, Linux, and Windows
+        include:
+          - os: macos-latest
+            artifact_path: "out/make/**/*.dmg"
+            artifact_name: "macOS"
+          - os: ubuntu-latest
+            artifact_path: "out/make/**/*.deb"
+            artifact_name: "Linux"
+          - os: windows-latest
+            artifact_path: "out/make/**/*.exe"
+            artifact_name: "Windows"
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Updated to v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Updated to v4
         with:
-          node-version: 18 # Use Node.js version 18
+          node-version: 20 # Updated to Node.js 20 to fix engine compatibility
+          cache: 'npm' # Cache npm dependencies for faster builds
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci # Use npm ci for faster, more reliable installs
 
       - name: Build and package application
-        # This command creates the platform-specific installer
         run: npm run make
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        # This action creates the GitHub release and uploads the artifacts
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          # This uses the tag name as the release name (e.g., "v1.0.0")
+          name: ${{ matrix.artifact_name }}-${{ github.ref_name }}
+          path: ${{ matrix.artifact_path }}
+
+  create-release:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2 # Updated to v2
+        with:
           name: Release ${{ github.ref_name }}
-          # This uses the tag message as the body of the release
-          body: ${{ github.event.head_commit.message }}
-          # Automatically mark it as a pre-release if the tag includes '-beta', '-alpha', etc.
-          prerelease: contains(github.ref, '-beta') || contains(github.ref, '-alpha')
-          # Upload the installers. The path pattern will find the .dmg, .exe, and .deb files.
+          body: |
+            Release ${{ github.ref_name }}
+            
+            ## Changes
+            ${{ github.event.head_commit.message }}
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
           files: |
-            out/make/**/*.deb
-            out/make/**/*.dmg
-            out/make/**/*.exe
+            artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
