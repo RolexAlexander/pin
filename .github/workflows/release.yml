@@ -1,0 +1,47 @@
+name: Build & Release Pin
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger this workflow on tags starting with 'v' (e.g., v1.0.0, v1.1.0)
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }} # Run on all three operating systems
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest] # Build for Mac, Linux, and Windows
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Use Node.js version 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and package application
+        # This command creates the platform-specific installer
+        run: npm run make
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        # This action creates the GitHub release and uploads the artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          # This uses the tag name as the release name (e.g., "v1.0.0")
+          name: Release ${{ github.ref_name }}
+          # This uses the tag message as the body of the release
+          body: ${{ github.event.head_commit.message }}
+          # Automatically mark it as a pre-release if the tag includes '-beta', '-alpha', etc.
+          prerelease: contains(github.ref, '-beta') || contains(github.ref, '-alpha')
+          # Upload the installers. The path pattern will find the .dmg, .exe, and .deb files.
+          files: |
+            out/make/**/*.deb
+            out/make/**/*.dmg
+            out/make/**/*.exe
