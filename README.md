@@ -40,7 +40,7 @@ Pin is a note-taking application designed for speed and simplicity. All your not
 
 ## Installation (For Users)
 
-To install and run Pin, head over to the [**Releases**](https://github.com/YOUR_USERNAME/pin/releases) page. Download the appropriate installer for your operating system:
+To install and run Pin, head over to the [**Releases**](https://github.com/RolexAlexander/pin/releases) page. Download the appropriate installer for your operating system:
 -   For Windows, download the `.exe` file.
 -   For macOS, download the `.dmg` file.
 -   For Linux, download the `.deb` or `.rpm` file.
@@ -53,7 +53,7 @@ To clone the repository and run the app locally for development, follow these st
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/pin.git
+    git clone https://github.com/RolexAlexander/pin.git
     cd pin
     ```
 
