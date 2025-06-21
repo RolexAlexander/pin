@@ -1,10 +1,10 @@
 # Pin
 
-![Pin Logo](./assets/logo.png)
+![Pin Logo](./public/logo.png)
 
 A sleek, modern, and fast local-first note-taking application built with Electron, TypeScript, and Tailwind CSS.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: apache](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/apache2.0)
 [![Electron](https://img.shields.io/badge/Electron-2B2E3A?style=for-the-badge&logo=electron&logoColor=61DAFB)](https://www.electronjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
