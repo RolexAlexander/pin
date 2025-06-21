@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'app-bg': '#f8fafc',
+              'sidebar-bg': '#ffffff',
+              'sidebar-border': '#e2e8f0',
+              'primary': '#3b82f6',
+              'primary-hover': '#2563eb',
+              'secondary': '#64748b',
+              'accent': '#8b5cf6',
+              'text-primary': '#0f172a',
+              'text-secondary': '#475569',
+              'text-muted': '#94a3b8',
+            },
+            fontFamily: {
+              'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            },
+            animation: {
+              'slide-in': 'slideIn 0.3s ease-out',
+              'fade-in': 'fadeIn 0.2s ease-out',
+              'scale-in': 'scaleIn 0.15s ease-out',
+            },
+            keyframes: {
+              slideIn: {
+                '0%': { transform: 'translateX(-10px)', opacity: '0' },
+                '100%': { transform: 'translateX(0)', opacity: '1' },
+              },
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              scaleIn: {
+                '0%': { transform: 'scale(0.95)', opacity: '0' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+            },
+            backdropBlur: {
+              'xs': '2px',
+            },
+            boxShadow: {
+              'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+              'soft': '0 2px 8px 0 rgba(0, 0, 0, 0.06)',
+              'medium': '0 4px 16px 0 rgba(0, 0, 0, 0.08)',
+              'strong': '0 8px 32px 0 rgba(0, 0, 0, 0.12)',
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+      }
+      
+      *::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      
+      *::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      *::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+        border: transparent;
+      }
+      
+      *::-webkit-scrollbar-thumb:hover {
+        background-color: #94a3b8;
+      }
+      
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      .nav-link {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      
+      .nav-link:hover::before {
+        opacity: 1;
+      }
+      
+      .nav-link:hover {
+        transform: translateX(4px);
+        background: rgba(59, 130, 246, 0.05);
+        border-color: rgba(59, 130, 246, 0.2);
+      }
+      
+      .nav-link.active {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.05));
+        border-color: rgba(59, 130, 246, 0.3);
+        font-weight: 500;
+        color: #3b82f6;
+      }
+      
+      .nav-link.active::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 20px;
+        background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+        border-radius: 2px;
+      }
+      
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .note-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      }
+      
+      .note-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: rgba(59, 130, 246, 0.3);
+      }
+      
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+      }
+      
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.5);
+      }
+      
+      .btn-secondary {
+        background: rgba(100, 116, 139, 0.1);
+        border: 1px solid rgba(100, 116, 139, 0.2);
+        transition: all 0.2s ease;
+      }
+      
+      .btn-secondary:hover {
+        background: rgba(100, 116, 139, 0.15);
+        border-color: rgba(100, 116, 139, 0.3);
+        transform: translateY(-1px);
+      }
+      
+      .input-modern {
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.8);
+      }
+      
+      .input-modern:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background: #ffffff;
+      }
+      
+      .toolbar-btn {
+        transition: all 0.15s ease;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+      }
+      
+      .toolbar-btn:hover {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.3);
+        transform: scale(1.05);
+      }
+      
+      .section-header {
+        position: relative;
+        padding-bottom: 12px;
+      }
+      
+      .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        border-radius: 2px;
+      }
+      
+      .tag-chip {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        transition: all 0.2s ease;
+      }
+      
+      .tag-chip:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+        border-color: rgba(59, 130, 246, 0.3);
+        transform: translateY(-1px);
+      }
+      
+      .sidebar-shadow {
+        box-shadow: 4px 0 24px -8px rgba(0, 0, 0, 0.08);
+      }
+      
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+      }
+      
+      .glow-on-hover:hover {
+        animation: pulse-glow 2s infinite;
+      }
+    </style>
+  </head>
+  <body class="bg-app-bg">
+    <div
+      class="relative flex size-full min-h-screen flex-col bg-gradient-to-br from-app-bg via-white to-slate-50 group/design-root overflow-hidden"
+      style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      <div class="flex h-full grow">
+        <!-- ===== MODERN SIDEBAR ===== -->
+        <aside class="flex flex-col w-72 bg-sidebar-bg border-r border-sidebar-border sidebar-shadow shrink-0">
+          <!-- Header with modern pin icon -->
+          <div class="flex items-center gap-3 h-16 px-6 border-b border-sidebar-border bg-gradient-to-r from-white to-slate-50">
+            <div class="flex items-center justify-center size-8 bg-gradient-to-br from-primary to-accent rounded-lg shadow-soft glow-on-hover">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L12 2L3 7V9C3 10.1 3.9 11 5 11V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V11C20.1 11 21 10.1 21 9ZM16 13.5C16 14.3 15.3 15 14.5 15S13 14.3 13 13.5S13.7 12 14.5 12S16 12.7 16 13.5ZM11 13.5C11 14.3 10.3 15 9.5 15S8 14.3 8 13.5S8.7 12 9.5 12S11 12.7 11 13.5Z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-text-primary text-lg font-semibold">Pin</h2>
+              <p class="text-xs text-text-muted font-medium">Smart Notes</p>
+            </div>
+          </div>
+          
+          <!-- Navigation -->
+          <div class="flex flex-col p-5 space-y-6">
+            <div>
+              <h3 class="px-3 pb-2 text-xs font-semibold text-text-muted uppercase tracking-wider">Workspace</h3>
+              <div class="space-y-1">
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-xl text-text-secondary border border-transparent" data-page="page-all-notes">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100">
+                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM17 12H7V10H17V12ZM17 9H7V7H17V9ZM17 15H7V13H17V15ZM17 18H7V16H17V18Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-medium">All Notes</span>
+                </a>
+                
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-xl text-text-secondary border border-transparent" data-page="page-editor">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100">
+                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-medium">Note Editor</span>
+                </a>
+              </div>
+            </div>
+            
+            <div>
+              <h3 class="px-3 pb-2 text-xs font-semibold text-text-muted uppercase tracking-wider">Organization</h3>
+              <div class="space-y-1">
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-xl text-text-secondary border border-transparent" data-page="page-tags">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100">
+                    <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7V17C3 18.1 3.9 19 5 19H16C16.67 19 17.27 18.67 17.63 18.16L22 12L17.63 5.84ZM16 17H5V7H16L19.55 12L16 17Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-medium">Tags</span>
+                </a>
+                
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-xl text-text-secondary border border-transparent" data-page="page-search">
+                  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-orange-100 to-amber-100">
+                    <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3S3 5.91 3 9.5S5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-medium">Search</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Settings at bottom -->
+          <div class="mt-auto p-5 border-t border-sidebar-border bg-gradient-to-r from-slate-50 to-white">
+            <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-xl text-text-secondary border border-transparent" data-page="page-settings">
+              <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-gray-100 to-slate-100">
+                <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.14,12.94C19.18,12.64 19.2,12.33 19.2,12C19.2,11.68 19.18,11.36 19.13,11.06L21.16,9.48C21.34,9.34 21.39,9.07 21.28,8.87L19.28,5.33C19.17,5.13 18.9,5.07 18.7,5.17L16.35,6.18C15.81,5.79 15.22,5.46 14.58,5.22L14.22,2.81C14.19,2.58 14,2.4 13.75,2.4H9.75C9.5,2.4 9.31,2.58 9.28,2.81L8.92,5.22C8.28,5.46 7.69,5.79 7.15,6.18L4.8,5.17C4.6,5.07 4.33,5.13 4.22,5.33L2.22,8.87C2.11,9.07 2.16,9.34 2.34,9.48L4.37,11.06C4.32,11.36 4.3,11.68 4.3,12C4.3,12.32 4.32,12.64 4.37,12.94L2.34,14.52C2.16,14.66 2.11,14.93 2.22,15.13L4.22,18.67C4.33,18.87 4.6,18.93 4.8,18.83L7.15,17.82C7.69,18.21 8.28,18.54 8.92,18.78L9.28,21.19C9.31,21.42 9.5,21.6 9.75,21.6H13.75C14,21.6 14.19,21.42 14.22,21.19L14.58,18.78C15.22,18.54 15.81,18.21 16.35,17.82L18.7,18.83C18.9,18.93 19.17,18.87 19.28,18.67L21.28,15.13C21.39,14.93 21.34,14.66 21.16,14.52L19.14,12.94ZM11.75,15.5C9.93,15.5 8.45,14.02 8.45,12.2C8.45,10.38 9.93,8.9 11.75,8.9C13.57,8.9 15.05,10.38 15.05,12.2C15.05,14.02 13.57,15.5 11.75,15.5Z"/>
+                </svg>
+              </div>
+              <span class="text-sm font-medium">Settings</span>
+            </a>
+          </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT AREA ===== -->
+        <main class="flex-1 overflow-auto bg-gradient-to-br from-white via-slate-50 to-blue-50">
+          <!-- View 1: All Notes -->
+          <section id="page-all-notes" class="page p-8 animate-fade-in">
+            <div class="max-w-6xl mx-auto">
+              <div class="flex justify-between items-center mb-8">
+                <div>
+                  <h1 class="text-3xl font-bold text-text-primary section-header">My Notebook</h1>
+                  <p class="text-text-secondary mt-2">Organize your thoughts and ideas</p>
+                </div>
+                <button id="new-note-btn" class="btn-primary text-white font-semibold py-3 px-6 rounded-xl hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                  </svg>
+                  New Note
+                </button>
+              </div>
+              
+              <div id="note-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Demo notes for styling -->
+                <div class="note-card p-6 rounded-2xl shadow-soft">
+                  <div class="flex items-start justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-text-primary line-clamp-2">Meeting Notes</h3>
+                    <span class="text-xs text-text-muted bg-gray-100 px-2 py-1 rounded-full">2 days ago</span>
+                  </div>
+                  <p class="text-text-secondary text-sm line-clamp-3 mb-4">Discussed project roadmap and upcoming deadlines. Need to follow up on client feedback...</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="tag-chip text-xs px-3 py-1 rounded-full font-medium">work</span>
+                    <span class="tag-chip text-xs px-3 py-1 rounded-full font-medium">meetings</span>
+                  </div>
+                </div>
+                
+                <div class="note-card p-6 rounded-2xl shadow-soft">
+                  <div class="flex items-start justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-text-primary line-clamp-2">Recipe Ideas</h3>
+                    <span class="text-xs text-text-muted bg-gray-100 px-2 py-1 rounded-full">1 week ago</span>
+                  </div>
+                  <p class="text-text-secondary text-sm line-clamp-3 mb-4">Collection of healthy dinner recipes to try this month. Focus on plant-based options...</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="tag-chip text-xs px-3 py-1 rounded-full font-medium">personal</span>
+                    <span class="tag-chip text-xs px-3 py-1 rounded-full font-medium">cooking</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- View 2: Note Editor -->
+          <section id="page-editor" class="page p-8 animate-fade-in" style="display: none">
+            <div class="max-w-4xl mx-auto">
+              <form id="note-editor-form" class="space-y-6">
+                <div class="glass-effect rounded-2xl shadow-medium p-8">
+                  <input
+                    id="note-title-input"
+                    placeholder="Untitled Note"
+                    class="input-modern w-full text-3xl font-bold border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-primary px-0 pb-4 mb-8 bg-transparent placeholder-text-muted"
+                  />
+                  
+                  <!-- Modern Toolbar -->
+                  <div class="flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 mb-6">
+                    <div class="flex items-center gap-2">
+                      <button type="button" class="toolbar-btn p-2.5">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M15.6 10.79C16.57 9.95 17.25 8.78 17.25 7.5C17.25 5.57 15.68 4 13.75 4C12.16 4 10.8 5.24 10.6 6.81H12.13C12.3 6.07 12.97 5.5 13.75 5.5C14.86 5.5 15.75 6.39 15.75 7.5C15.75 8.61 14.86 9.5 13.75 9.5H13V11H13.75C15.68 11 17.25 12.57 17.25 14.5C17.25 16.43 15.68 18 13.75 18C12.16 18 10.8 16.76 10.6 15.19H12.13C12.3 15.93 12.97 16.5 13.75 16.5C14.86 16.5 15.75 15.61 15.75 14.5C15.75 13.39 14.86 12.5 13.75 12.5H13V11H13.75C14.59 11 15.33 10.56 15.6 10.79ZM8 4V6H6V18H8V20H4V4H8Z"/>
+                        </svg>
+                      </button>
+                      <button type="button" class="toolbar-btn p-2.5 italic font-bold">
+                        I
+                      </button>
+                      <button type="button" class="toolbar-btn p-2.5 underline font-bold">
+                        U
+                      </button>
+                    </div>
+                    
+                    <div class="w-px h-6 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+                    
+                    <div class="flex items-center gap-2">
+                      <button type="button" class="toolbar-btn p-2.5">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"/>
+                        </svg>
+                      </button>
+                      <button type="button" class="toolbar-btn p-2.5">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M2 15.5V2H3.5L16 14.5L14.5 16L2 3.5V15.5ZM5.83 2L18 14.17V2H5.83Z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <textarea
+                    id="note-content-textarea"
+                    placeholder="Start writing your note here..."
+                    class="input-modern w-full h-96 rounded-xl p-6 resize-none text-base leading-relaxed"
+                  ></textarea>
+                </div>
+                
+                <!-- Tags Section -->
+                <div class="glass-effect rounded-2xl shadow-medium p-8">
+                  <h3 class="text-xl font-semibold mb-6 text-text-primary section-header">Tags</h3>
+                  <div id="note-tags-container" class="flex flex-wrap gap-3">
+                    <span class="tag-chip px-4 py-2 rounded-xl font-medium cursor-pointer">work</span>
+                    <span class="tag-chip px-4 py-2 rounded-xl font-medium cursor-pointer">personal</span>
+                    <span class="tag-chip px-4 py-2 rounded-xl font-medium cursor-pointer">ideas</span>
+                  </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex justify-between items-center pt-6">
+                  <button
+                    type="button"
+                    id="delete-note-btn"
+                    class="bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-red-600 hover:to-red-700 hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+                    style="display: none"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/>
+                    </svg>
+                    Delete Note
+                  </button>
+                  <div class="flex gap-3">
+                    <button
+                      type="button"
+                      class="btn-secondary text-text-secondary font-semibold py-3 px-6 rounded-xl transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      class="btn-primary text-white font-semibold py-3 px-6 rounded-xl hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+                    >
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V7L17 3ZM19 19H5V5H16.17L19 7.83V19ZM12 12C10.34 12 9 13.34 9 15S10.34 18 12 18 15 16.66 15 15 13.66 12 12 12ZM6 6H15V10H6V6Z"/>
+                      </svg>
+                      Save Note
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- View 3: Tags -->
+          <section id="page-tags" class="page p-8 animate-fade-in" style="display: none">
+            <div class="max-w-5xl mx-auto">
+              <div class="flex justify-between items-center mb-8">
+                <div>
+                  <h1 class="text-3xl font-bold text-text-primary section-header">Tags</h1>
+                  <p class="text-text-secondary mt-2">Organize your notes with labels</p>
+                </div>
+                <form id="add-tag-form" class="flex items-center gap-3">
+                  <input
+                    id="add-tag-input"
+                    type="text"
+                    placeholder="New tag name"
+                    class="input-modern border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    class="btn-primary text-white font-semibold py-3 px-6 rounded-xl hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    Add Tag
+                  </button>
+                </form>
+              </div>
+              
+              <div class="glass-effect rounded-2xl shadow-medium overflow-hidden">
+                <table class="min-w-full">
+                  <thead class="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200">
+                    <tr>
+                      <th class="text-left p-6 font-semibold text-text-primary text-sm">Tag Name</th>
+                      <th class="text-left p-6 font-semibold text-text-primary text-sm">Notes Count</th>
+                      <th class="text-right p-6 font-semibold text-text-primary text-sm">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tags-list-container" class="bg-white divide-y divide-gray-100">
+                    <!-- Demo tags -->
+                    <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
+                      <td class="p-6">
+                        <span class="tag-chip px-4 py-2 rounded-xl font-medium">work</span>
+                      </td>
+                      <td class="p-6 text-text-secondary">5 notes</td>
+                      <td class="p-6 text-right">
+                        <button class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all duration-200">
+                          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
+                      <td class="p-6">
+                        <span class="tag-chip px-4 py-2 rounded-xl font-medium">personal</span>
+                      </td>
+                      <td class="p-6 text-text-secondary">3 notes</td>
+                      <td class="p-6 text-right">
+                        <button class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all duration-200">
+                          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- View 4: Search -->
+          <section id="page-search" class="page p-8 animate-fade-in" style="display: none">
+            <div class="max-w-4xl mx-auto">
+              <div class="mb-8">
+                <h1 class="text-3xl font-bold text-text-primary section-header mb-2">Search</h1>
+                <p class="text-text-secondary">Find notes by title, content, or tags</p>
+              </div>
+              
+              <div class="glass-effect rounded-2xl shadow-medium p-8 mb-8">
+                <div class="relative">
+                  <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3S3 5.91 3 9.5S5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14Z"/>
+                  </svg>
+                  <input
+                    id="search-input"
+                    type="search"
+                    placeholder="Search notes by title or content..."
+                    class="input-modern w-full pl-12 pr-4 py-4 text-lg rounded-xl focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+              </div>
+              
+              <div id="search-results-container" class="space-y-4">
+                <!-- Search results will appear here -->
+                <div class="text-center py-12">
+                  <svg class="w-16 h-16 mx-auto text-text-muted mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3S3 5.91 3 9.5S5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14Z"/>
+                  </svg>
+                  <p class="text-text-muted text-lg">Start typing to search your notes</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- View 5: Settings -->
+          <section id="page-settings" class="page p-8 animate-fade-in" style="display: none">
+            <div class="max-w-3xl mx-auto">
+              <div class="mb-8">
+                <h1 class="text-3xl font-bold text-text-primary section-header mb-2">Settings</h1>
+                <p class="text-text-secondary">Customize your Pin experience</p>
+              </div>
+              
+              <div class="space-y-8">
+                <!-- Theme Settings -->
+                <div class="glass-effect rounded-2xl shadow-medium p-8">
+                  <h2 class="text-xl font-semibold mb-6 text-text-primary flex items-center gap-3">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100">
+                      <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 18.5C13.79 18.5 15.4 17.77 16.62 16.54C17.85 15.31 18.5 13.79 18.5 12C18.5 10.21 17.77 8.6 16.54 7.38C15.31 6.15 13.79 5.5 12 5.5V18.5ZM12 2C17.5 2 22 6.5 22 12S17.5 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2ZM12 4C7.58 4 4 7.58 4 12S7.58 20 12 20C16.42 20 20 16.42 20 12S16.42 4 12 4Z"/>
+                      </svg>
+                    </div>
+                    Theme
+                  </h2>
+                  <div class="grid grid-cols-2 gap-4">
+                    <button class="theme-btn p-6 border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 text-left" data-theme="light">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="w-4 h-4 bg-white border-2 border-gray-300 rounded-full"></div>
+                        <span class="font-semibold text-text-primary">Light Theme</span>
+                      </div>
+                      <p class="text-sm text-text-secondary">Clean and bright interface</p>
+                    </button>
+                    <button class="theme-btn p-6 border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 text-left" data-theme="dark">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="w-4 h-4 bg-gray-700 border-2 border-gray-600 rounded-full"></div>
+                        <span class="font-semibold text-text-primary">Dark Theme</span>
+                      </div>
+                      <p class="text-sm text-text-secondary">Easy on the eyes for low-light</p>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Font Size Settings -->
+                <div class="glass-effect rounded-2xl shadow-medium p-8">
+                  <h2 class="text-xl font-semibold mb-6 text-text-primary flex items-center gap-3">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100">
+                      <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 4V6H16V4H9ZM9 8V6H7V20H9V12H11V20H13V8H9Z"/>
+                      </svg>
+                    </div>
+                    Font Size
+                  </h2>
+                  <div class="grid grid-cols-3 gap-4">
+                    <button class="font-size-btn p-4 border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 text-center" data-size="sm">
+                      <div class="text-sm font-semibold text-text-primary mb-1">Small</div>
+                      <div class="text-xs text-text-secondary">Compact view</div>
+                    </button>
+                    <button class="font-size-btn p-4 border-2 border-primary bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl text-center" data-size="base">
+                      <div class="text-base font-semibold text-primary mb-1">Medium</div>
+                      <div class="text-sm text-text-secondary">Default size</div>
+                    </button>
+                    <button class="font-size-btn p-4 border-2 border-gray-200 rounded-xl hover:border-primary hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 text-center" data-size="lg">
+                      <div class="text-lg font-semibold text-text-primary mb-1">Large</div>
+                      <div class="text-base text-text-secondary">Easy reading</div>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- About Section -->
+                <div class="glass-effect rounded-2xl shadow-medium p-8">
+                  <h2 class="text-xl font-semibold mb-6 text-text-primary flex items-center gap-3">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100">
+                      <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12S6.48 22 12 22S22 17.52 22 12S17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12S7.59 4 12 4S20 7.59 20 12S16.41 20 12 20Z"/>
+                      </svg>
+                    </div>
+                    About Pin
+                  </h2>
+                  <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2">
+                      <span class="text-text-secondary">Version</span>
+                      <span class="font-semibold text-text-primary">1.0.0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                      <span class="text-text-secondary">Build</span>
+                      <span class="font-semibold text-text-primary">2024.1</span>
+                    </div>
+                    <div class="pt-4 border-t border-gray-200">
+                      <p class="text-text-secondary text-sm leading-relaxed">
+                        Pin is a modern note-taking application designed to help you organize your thoughts and ideas efficiently.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    
+    <script>
+      // Basic navigation functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-link[data-page]');
+        const pages = document.querySelectorAll('.page');
+        
+        // Set initial active state
+        navLinks[0].classList.add('active');
+        
+        navLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            navLinks.forEach(nl => nl.classList.remove('active'));
+            
+            // Hide all pages
+            pages.forEach(page => page.style.display = 'none');
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Show target page
+            const targetPage = document.getElementById(this.dataset.page);
+            if (targetPage) {
+              targetPage.style.display = 'block';
+            }
+          });
+        });
+        
+        // Theme switching
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        themeButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            themeButtons.forEach(b => {
+              b.classList.remove('border-primary', 'bg-gradient-to-br', 'from-blue-50', 'to-indigo-50');
+              b.classList.add('border-gray-200');
+            });
+            this.classList.remove('border-gray-200');
+            this.classList.add('border-primary', 'bg-gradient-to-br', 'from-blue-50', 'to-indigo-50');
+          });
+        });
+        
+        // Font size switching
+        const fontSizeButtons = document.querySelectorAll('.font-size-btn');
+        fontSizeButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            fontSizeButtons.forEach(b => {
+              b.classList.remove('border-primary', 'bg-gradient-to-br', 'from-blue-50', 'to-indigo-50');
+              b.classList.add('border-gray-200');
+            });
+            this.classList.remove('border-gray-200');
+            this.classList.add('border-primary', 'bg-gradient-to-br', 'from-blue-50', 'to-indigo-50');
+          });
+        });
+      });
+    </script>
+    <script type="module" src="/src/renderer.ts"></script>
+  </body>
+</html>
